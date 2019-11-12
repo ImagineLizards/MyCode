@@ -8,7 +8,7 @@ def main():
     url = ''
     outputfile = ''
     try:
-        opts, args = getopt.getopt(sys.argv[1:],'l:p:u:o:')
+        opts, args = getopt.getopt(sys.argv[1:],'l:p:u:')
     except getopt.GetoptError:
         print(sys.argv[0] + ' -o <outputfile> -l <login> -p <password-file> -u <url>')
         sys.exit(2)
