@@ -1,0 +1,39 @@
+#!/usr/bin/env python3
+import argparse,subprocess,os,sys,re
+def safe_confirm():
+    confirm = input("Are you sure you want to execute this program? This will lead to changes to the system. y/n ")
+    if confirm != "y":
+        sys.exit()
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Change your mac address.")
+    parser.add_argument("i", help="interface", type=str)
+    parser.add_argument("n", help="new mac address [##:##:##:##:##:##]", type=str)
+    return parser.parse_args()
+
+def mac_changer(interface, new_mac):
+    print(current_mac)
+    subprocess.call(["ifconfig",interface,"down"])
+    subprocess.call(["ifconfig",interface,"hw","ether",new_mac])
+    subprocess.call(["ifconfig",interface,"up"])
+
+def get_current_mac(interface):
+    ifconfig_output = subprocess.check_output(["ifconfig", interface])
+    mac_search = re.search(r"\w\w:\w\w:\w\w:\w\w:\w\w:\w\w", ifconfig_output.decode("utf-8"))
+    if mac_search:
+        return mac_search.group(0)
+    else:
+        print("[-] Unable to read MAC address")
+
+#safe_confirm()
+
+args = get_args()
+current_mac = get_current_mac(args.i)
+print("Current MAC Address = " + str(current_mac))
+mac_changer(args.i,args.n)
+current_mac = get_current_mac(args.i)
+
+if current_mac==args.n:
+    print("[+] MAC Address successfully changed to " + current_mac)
+else:
+    print("[-] MAC Address unchanged.")
